@@ -1,6 +1,8 @@
 'use client'
 
-import { signIn } from "next-auth/react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 
 interface AuthRowInterface {
     provider: string;
@@ -23,6 +25,17 @@ const AuthRow = ({ provider }: AuthRowInterface) => {
 }
 
 const AuthPage = () => {
+    const { status, data: session } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (session) {
+            if (session.user.role === "") {
+                router.push("/auth/role");
+            }
+        }
+    }, [status]);
+
     return (
         <div className = "w-1/4 min-w-[350px] flex flex-col items-center justify-center">
             <h1 

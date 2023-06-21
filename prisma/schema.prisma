@@ -58,9 +58,9 @@ model VerificationToken {
 model Student {
     id String @id @default(cuid())
     userID String @unique
-    user User @relation(fields: [userID], references: [id])
-    wishlist Course[] @relation(name: "wishlist")
-    cart Course[] @relation(name: "cart")
+    user User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    wishlist String[]
+    cart String[]
     purchases Course[]
     reviews Review[]
 }
@@ -68,7 +68,7 @@ model Student {
 model Teacher {
     id String @id @default(cuid())
     userID String @unique
-    user User @relation(fields: [userID], references: [id])
+    user User @relation(fields: [userID], references: [id], onDelete: Cascade)
     courses Course[]
     scale String
     organization String
@@ -76,26 +76,24 @@ model Teacher {
 
 model Course {
     id String @id @default(cuid())
-    creator Teacher @relation(fields: [creatorId], references: [id])
-    creatorId String @unique
+    creator Teacher @relation(fields: [creatorId], references: [userID], onDelete: Cascade)
+    creatorId String
     name String
     description String
     visuals String[]
     count Int @default(0)
     rating Float @default(0)
-    price Float 
-    wishlist Student[] @relation(name: "wishlist")
-    cart Student[] @relation(name: "cart")
-    purchases Student[]
+    price Float
     lessons Lesson[]
     reviews Review[]
     categories Categories[]
+    students Student[]
 }
 
 model Lesson {
     id String @id @default(cuid())
     courseID String
-    course Course @relation(fields: [courseID], references: [id])
+    course Course @relation(fields: [courseID], references: [id], onDelete: Cascade)
     sublessons Json[]
     title String
     description String
@@ -104,7 +102,7 @@ model Lesson {
 model Review {
     id String @id @default(cuid())
     courseID String
-    course Course @relation(fields: [courseID], references: [id])
+    course Course @relation(fields: [courseID], references: [id], onDelete: Cascade)
     rating Float
     studentID String
     student Student @relation(fields: [studentID], references: [id])

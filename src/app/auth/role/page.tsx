@@ -9,6 +9,7 @@ import {
     FormEvent,
 } from "react";
 import { getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faChalkboardUser,
@@ -53,6 +54,7 @@ const RolePage = () => {
     const [email, setEmail] = useState("");
     const [scale, setScale] = useState("");
     const [organization, setOrganization] = useState("");
+    const router = useRouter();
 
     useEffect(() => {
         getSession().then((session) => {
@@ -60,7 +62,7 @@ const RolePage = () => {
         })
     });
 
-    const assignRoleStudent = async () => {
+    const assignRoleStudent = () => {
         if (role === "") {
             alert("Please choose your role!");
             return;
@@ -69,26 +71,39 @@ const RolePage = () => {
             dialogRef.current?.showModal();
             return;
         }
-        const res = await fetch("/api/role", {
+        fetch("/api/role", {
             method: "POST",
             body: JSON.stringify({
                 role, email
             })
-        });
-        alert(await res.json());
+        })
+        .then(async res => {
+            if (res.status < 300) {
+                alert(await res.json());
+                router.push("/student/coures");
+                return;
+            }
+            alert("Something went wrong with the server, please try again later!")
+        })
+        .catch(e => console.log(e));
     };
 
-    const assignRoleTeacher = async (e: FormEvent<HTMLFormElement>) => {
+    const assignRoleTeacher = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (role !== "" && scale !== "" && organization !== "") {
-            const res = await fetch(
+            fetch(
                 "/api/role", {
                     method: "POST",
                     body: JSON.stringify({ email, role, scale, organization }),
                 }
-            );
-            alert(await res.json());
-            return;
+            )
+            .then(async res => {
+                if (res.status < 300) {
+                    alert(await res.json());
+                    router.push("/teacher/courses");
+                }
+            })
+            .catch(e => console.log(e));
         }
         alert("Please fill in the necessary details!");
     };
@@ -99,7 +114,7 @@ const RolePage = () => {
             <dialog ref={dialogRef}>
                 <form
                     method="dialog"
-                    onSubmit={async (e) => await assignRoleTeacher(e)}
+                    onSubmit={(e) => assignRoleTeacher(e)}
                     className="flex flex-col"
                 >
                     <div className="w-full mb-3 relative">
@@ -166,7 +181,7 @@ const RolePage = () => {
             </div>
             <div
                 className="w-full bg-[#FF642D] text-center py-2 cursor-pointer"
-                onClick={async () => await assignRoleStudent()}
+                onClick={() => assignRoleStudent()}
             >
                 <h1 className="text-white text-xl font-semibold">Proceed</h1>
             </div>

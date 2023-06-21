@@ -22,7 +22,7 @@ export const POST = async (req: Request) => {
                 status: 404
             });
         }
-        user.role.push(role);
+        user.role.push(role === "Student" ? "student" : "teacher");
         const updateStudentPromise = prisma.user.update({
             where: { email },
             data: {
@@ -30,7 +30,7 @@ export const POST = async (req: Request) => {
             }
         });
         const allPromises: Array<Promise<any>> = [updateStudentPromise];
-        if (role === "student") {
+        if (role === "Student") {
             allPromises.push((async () => {
                 await prisma.student.create({
                     data: {

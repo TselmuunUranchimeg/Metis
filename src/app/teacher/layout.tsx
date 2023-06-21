@@ -1,9 +1,18 @@
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 import Dashboard from "@/components/dashboard";
 
 const TeacherLayout = async ({ children }: { children: React.ReactNode }) => {
-    const { image, name, id } = (await getServerSession())!.user;
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        redirect("/auth");
+    }
+    if (session.user!.role !== "teacher") {
+        redirect("/auth/role");
+    }
+    const { image, name, id } = session.user;
 
     return (
         <div className = "w-screen h-screen">
@@ -22,7 +31,7 @@ const TeacherLayout = async ({ children }: { children: React.ReactNode }) => {
 export default TeacherLayout;
 
 export const generateMetadata: () => Promise<Metadata> = async () => {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     return {
         title: `${session?.user?.name} - Courses`
     };

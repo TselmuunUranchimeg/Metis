@@ -120,7 +120,7 @@ const Dashboard = ({ children, role, profileImg, name, userID }: DashboardInterf
                     <p>Log out</p>
                 </div>
             </div>
-            <div className="w-[calc(70%_+_1px)] min-w-[calc(100%_-_301px)] h-full">
+            <div className="w-[calc(70%_+_1px)] min-w-[calc(100%_-_301px)] h-full box-border py-5 px-7">
                 {children}
             </div>
         </div>
